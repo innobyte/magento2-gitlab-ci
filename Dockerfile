@@ -20,6 +20,8 @@ RUN apt-get update \
    && apt-get install -y zlib1g-dev \
        && docker-php-ext-install zip \
    && docker-php-ext-install bcmath \
+   && apt-get install -y python3 python3-pip \
+   && pip3 install awscli \
    && rm -rf /var/lib/apt/lists/*
 
 # PHP Configuration

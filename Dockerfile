@@ -3,7 +3,8 @@ MAINTAINER Alin Alexandru <alin.alexandru@innobyte.com>
 
 RUN apt-get update \
    && apt-get install -y \
-       git-core \
+      git-core \
+      pigz \
    && docker-php-ext-install mbstring \
    && docker-php-ext-install pdo_mysql \
    && apt-get install -y libxml2-dev \
@@ -20,7 +21,6 @@ RUN apt-get update \
    && apt-get install -y zlib1g-dev \
        && docker-php-ext-install zip \
    && docker-php-ext-install bcmath \
-   && pigz \
    && rm -rf /var/lib/apt/lists/*
 
 # PHP Configuration

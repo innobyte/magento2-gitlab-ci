@@ -4,7 +4,7 @@ MAINTAINER Alin Alexandru <alin.alexandru@innobyte.com>
 RUN apt-get update \
    && apt-get install -y \
       git-core \
-      pigz \
+      pigz unzip zip \
    && docker-php-ext-install mbstring \
    && docker-php-ext-install pdo_mysql \
    && apt-get install -y libxml2-dev \

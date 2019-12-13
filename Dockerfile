@@ -1,16 +1,14 @@
-FROM php:7.1
+FROM php:7.2
 MAINTAINER Alin Alexandru <alin.alexandru@innobyte.com>
 
 RUN apt-get update \
    && apt-get install -y \
        git-core \
        pigz unzip zip \
-   && docker-php-ext-install mbstring \
+       rsync \
    && docker-php-ext-install pdo_mysql \
    && apt-get install -y libxml2-dev \
        && docker-php-ext-install soap \
-   && apt-get install -y libmcrypt4 libmcrypt-dev \
-       && docker-php-ext-install mcrypt \
    && apt-get install -y libxslt-dev \
        && docker-php-ext-install xsl \
    && apt-get install -y libicu-dev \

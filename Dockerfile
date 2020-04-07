@@ -1,4 +1,4 @@
-FROM php:7.2
+FROM php:7.3
 MAINTAINER Alin Alexandru <alin.alexandru@innobyte.com>
 
 RUN apt-get update \
@@ -19,6 +19,10 @@ RUN apt-get update \
    && apt-get install -y zlib1g-dev \
        && docker-php-ext-install zip \
    && docker-php-ext-install bcmath \
+   && apt-get install -y librabbitmq-dev \
+       && docker-php-ext-install sockets \
+       && pecl install amqp \
+       && docker-php-ext-enable amqp \
    && rm -rf /var/lib/apt/lists/*
 
 # PHP Configuration
@@ -29,22 +33,6 @@ RUN echo "date.timezone=UTC" > $PHP_INI_DIR/conf.d/date_timezone.ini
 RUN curl -sS https://getcomposer.org/installer | php \
     && mv composer.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
-
-# Install phpunit and put binary into $PATH
-RUN curl -sSLo phpunit.phar https://phar.phpunit.de/phpunit-6.phar \
-    && chmod 755 phpunit.phar \
-    && mv phpunit.phar /usr/local/bin/ \
-    && ln -s /usr/local/bin/phpunit.phar /usr/local/bin/phpunit
-
-# Install PHP Code sniffer
-RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar \
-    && chmod 755 phpcs.phar \
-    && mv phpcs.phar /usr/local/bin/ \
-    && ln -s /usr/local/bin/phpcs.phar /usr/local/bin/phpcs \
-    && curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar \
-    && chmod 755 phpcbf.phar \
-    && mv phpcbf.phar /usr/local/bin/ \
-    && ln -s /usr/local/bin/phpcbf.phar /usr/local/bin/phpcbf
     
 # Install deployer
 RUN curl -LO https://deployer.org/deployer.phar \

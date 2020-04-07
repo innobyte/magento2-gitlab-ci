@@ -16,7 +16,7 @@ RUN apt-get update \
    && apt-get install -y libpng-dev libjpeg-dev \
        && docker-php-ext-configure gd --with-jpeg-dir=/usr/lib \
        && docker-php-ext-install gd \
-   && apt-get install -y zlib1g-dev \
+   && apt-get install -y libzip-dev \
        && docker-php-ext-install zip \
    && docker-php-ext-install bcmath \
    && apt-get install -y librabbitmq-dev \

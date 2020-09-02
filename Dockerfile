@@ -1,4 +1,4 @@
-FROM php:7.3
+FROM php:7.4
 MAINTAINER Alin Alexandru <alin.alexandru@innobyte.com>
 
 RUN apt-get update \

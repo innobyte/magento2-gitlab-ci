@@ -23,28 +23,30 @@ RUN apt-get update \
        && docker-php-ext-install sockets \
        && pecl install amqp \
        && docker-php-ext-enable amqp \
+   && docker-php-ext-install pcntl \
    && rm -rf /var/lib/apt/lists/*
 
 # PHP Configuration
 RUN echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini
 RUN echo "date.timezone=UTC" > $PHP_INI_DIR/conf.d/date_timezone.ini
 
-# Install composer 
-RUN curl -sS https://getcomposer.org/installer | php \
+# Install composer and put binary into $PATH
+RUN curl -OL https://getcomposer.org/download/1.10.20/composer.phar \
+    && chmod +x composer.phar \
     && mv composer.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
 
 # Install PHP Code sniffer
-RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar \
+RUN curl -OL https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.5.8/phpcs.phar \
     && chmod 755 phpcs.phar \
     && mv phpcs.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/phpcs.phar /usr/local/bin/phpcs \
-    && curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar \
+    && curl -OL https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.5.8/phpcbf.phar \
     && chmod 755 phpcbf.phar \
     && mv phpcbf.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/phpcbf.phar /usr/local/bin/phpcbf
-    
+
 # Install deployer
-RUN curl -LO https://deployer.org/deployer.phar \
+RUN curl -LO https://deployer.org/releases/v6.8.0/deployer.phar \
     && mv deployer.phar /usr/local/bin/dep \
     && chmod +x /usr/local/bin/dep

@@ -5,6 +5,7 @@ RUN apt-get update \
    && apt-get install -y \
        git-core \
        pigz unzip zip \
+       rsync \
    && docker-php-ext-install mbstring \
    && docker-php-ext-install pdo_mysql \
    && apt-get install -y libxml2-dev \
@@ -21,6 +22,11 @@ RUN apt-get update \
    && apt-get install -y zlib1g-dev \
        && docker-php-ext-install zip \
    && docker-php-ext-install bcmath \
+   && apt-get install -y librabbitmq-dev \
+       && docker-php-ext-install sockets \
+       && pecl install amqp \
+       && docker-php-ext-enable amqp \
+   && docker-php-ext-install pcntl \
    && rm -rf /var/lib/apt/lists/*
 
 # PHP Configuration
@@ -28,27 +34,22 @@ RUN echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini
 RUN echo "date.timezone=UTC" > $PHP_INI_DIR/conf.d/date_timezone.ini
 
 # Install composer and put binary into $PATH
-RUN curl -sS https://getcomposer.org/installer | php \
+RUN curl -OL https://getcomposer.org/download/1.10.20/composer.phar \
+    && chmod +x composer.phar \
     && mv composer.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
 
-# Install phpunit and put binary into $PATH
-RUN curl -sSLo phpunit.phar https://phar.phpunit.de/phpunit-6.phar \
-    && chmod 755 phpunit.phar \
-    && mv phpunit.phar /usr/local/bin/ \
-    && ln -s /usr/local/bin/phpunit.phar /usr/local/bin/phpunit
-
 # Install PHP Code sniffer
-RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar \
+RUN curl -OL https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.5.8/phpcs.phar \
     && chmod 755 phpcs.phar \
     && mv phpcs.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/phpcs.phar /usr/local/bin/phpcs \
-    && curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar \
+    && curl -OL https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.5.8/phpcbf.phar \
     && chmod 755 phpcbf.phar \
     && mv phpcbf.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/phpcbf.phar /usr/local/bin/phpcbf
-    
+
 # Install deployer
-RUN curl -LO https://deployer.org/deployer.phar \
+RUN curl -LO https://deployer.org/releases/v6.4.3/deployer.phar \
     && mv deployer.phar /usr/local/bin/dep \
     && chmod +x /usr/local/bin/dep

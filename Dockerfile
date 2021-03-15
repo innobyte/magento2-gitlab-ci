@@ -6,6 +6,7 @@ RUN apt-get update \
        git-core \
        pigz unzip zip \
        rsync \
+       default-mysql-client \
    && docker-php-ext-install pdo_mysql \
    && apt-get install -y libxml2-dev \
        && docker-php-ext-install soap \

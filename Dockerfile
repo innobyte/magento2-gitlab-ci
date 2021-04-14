@@ -13,8 +13,8 @@ RUN apt-get update \
        && docker-php-ext-install xsl \
    && apt-get install -y libicu-dev \
        && docker-php-ext-install intl \
-   && apt-get install -y libpng-dev libjpeg-dev \
-       && docker-php-ext-configure gd \
+   && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev \
+       && docker-php-ext-configure gd --with-freetype --with-jpeg \
        && docker-php-ext-install gd \
    && apt-get install -y libzip-dev \
        && docker-php-ext-install zip \

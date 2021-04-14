@@ -23,6 +23,7 @@ RUN apt-get update \
        && docker-php-ext-install sockets \
        && pecl install amqp \
        && docker-php-ext-enable amqp \
+   && docker-php-ext-install pcntl \
    && rm -rf /var/lib/apt/lists/*
 
 # PHP Configuration

@@ -1,4 +1,4 @@
-FROM php:7.4
+FROM php:8.1
 MAINTAINER Alin Alexandru <alin.alexandru@innobyte.com>
 
 RUN apt-get update \
@@ -24,24 +24,28 @@ RUN apt-get update \
        && pecl install amqp \
        && docker-php-ext-enable amqp \
    && docker-php-ext-install pcntl \
-   && rm -rf /var/lib/apt/lists/*
+   && rm -rf /var/lib/apt/lists/* \
+      /tmp/* \
+      /var/tmp/* \
+      /usr/share/doc \
+      /usr/share/doc-base
 
 # PHP Configuration
 RUN echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini
 RUN echo "date.timezone=UTC" > $PHP_INI_DIR/conf.d/date_timezone.ini
 
 # Install composer and put binary into $PATH
-RUN curl -OL https://getcomposer.org/download/2.2.5/composer.phar \
+RUN curl -OL https://getcomposer.org/download/2.3.5/composer.phar \
     && chmod +x composer.phar \
     && mv composer.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
 
 # Install PHP Code sniffer
-RUN curl -OL https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.5.8/phpcs.phar \
+RUN curl -OL https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.6.2/phpcs.phar \
     && chmod 755 phpcs.phar \
     && mv phpcs.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/phpcs.phar /usr/local/bin/phpcs \
-    && curl -OL https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.5.8/phpcbf.phar \
+    && curl -OL https://github.com/squizlabs/PHP_CodeSniffer/releases/download/3.6.2/phpcbf.phar \
     && chmod 755 phpcbf.phar \
     && mv phpcbf.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/phpcbf.phar /usr/local/bin/phpcbf

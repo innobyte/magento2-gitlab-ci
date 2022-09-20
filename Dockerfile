@@ -24,6 +24,8 @@ RUN apt-get update \
        && pecl install amqp \
        && docker-php-ext-enable amqp \
    && docker-php-ext-install pcntl \
+   && apt-get -y install libgmp-dev \
+       && docker-php-ext-install gmp \
    && rm -rf /var/lib/apt/lists/*
 
 # PHP Configuration

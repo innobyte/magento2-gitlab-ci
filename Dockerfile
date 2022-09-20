@@ -24,6 +24,8 @@ RUN apt-get update \
        && pecl install amqp \
        && docker-php-ext-enable amqp \
    && docker-php-ext-install pcntl \
+   && apt-get -y install libgmp-dev \
+      && docker-php-ext-install gmp \
    && rm -rf /var/lib/apt/lists/*
 
 # PHP Configuration
@@ -31,7 +33,7 @@ RUN echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini
 RUN echo "date.timezone=UTC" > $PHP_INI_DIR/conf.d/date_timezone.ini
 
 # Install composer and put binary into $PATH
-RUN curl -OL https://getcomposer.org/download/2.2.5/composer.phar \
+RUN curl -OL https://getcomposer.org/download/2.4.2/composer.phar \
     && chmod +x composer.phar \
     && mv composer.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/composer.phar /usr/local/bin/composer

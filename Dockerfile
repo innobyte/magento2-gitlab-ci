@@ -33,7 +33,7 @@ RUN echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini
 RUN echo "date.timezone=UTC" > $PHP_INI_DIR/conf.d/date_timezone.ini
 
 # Install composer and put binary into $PATH
-RUN curl -OL https://getcomposer.org/download/2.3.10/composer.phar \
+RUN curl -OL https://getcomposer.org/download/2.2.5/composer.phar \
     && chmod +x composer.phar \
     && mv composer.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/composer.phar /usr/local/bin/composer

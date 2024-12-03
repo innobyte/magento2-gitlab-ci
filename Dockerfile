@@ -1,9 +1,5 @@
 ARG PHP_VERSION=8.2
-ARG COMPOSER_VERSION=2.2
-ARG DEPLOYER_VERSION=v6.8.0
-ARG PHPCS_VERSION=v3.65.0
-
-FROM php:${PHP_VERSION}-cli
+FROM php:${PHP_VERSION}-cli as base
 
 RUN apt-get update \
    && apt-get install -y \
@@ -33,12 +29,17 @@ RUN apt-get update \
    && docker-php-ext-install bcmath \
    && rm -rf /var/lib/apt/lists/*
 
+FROM base as dependencies
+ARG COMPOSER_VERSION=latest-2.2.x
+ARG DEPLOYER_VERSION=v7.5.8
+ARG PHPCS_VERSION=3.7.2
+
 # PHP Configuration
 RUN echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini
 RUN echo "date.timezone=UTC" > $PHP_INI_DIR/conf.d/date_timezone.ini
     
 # Install PHP Code sniffer
-RUN curl -OL https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/download/${PHPCS_VERSION}/php-cs-fixer.phar \
+RUN curl -OL https://github.com/squizlabs/PHP_CodeSniffer/releases/download/${PHPCS_VERSION}/phpcs.phar \
     && chmod 755 phpcs.phar \
     && mv phpcs.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/phpcs.phar /usr/local/bin/phpcs
@@ -49,4 +50,6 @@ RUN curl -LO https://deployer.org/releases/${DEPLOYER_VERSION}/deployer.phar \
     && chmod +x /usr/local/bin/dep
 
 # Install composer
-COPY --from=composer:${COMPOSER_VERSION} /usr/bin/composer /usr/local/bin/composer
+RUN curl -LO https://getcomposer.org/download/${COMPOSER_VERSION}/composer.phar \
+    && mv composer.phar /usr/local/bin/composer \
+    && chmod +x /usr/local/bin/composer

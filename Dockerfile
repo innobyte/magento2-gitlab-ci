@@ -7,6 +7,7 @@ RUN apt-get update \
       pigz unzip zip \
       rsync \
    && docker-php-ext-install pdo_mysql \
+   && docker-php-ext-install ftp \
    && apt-get install -y libxml2-dev \
        && docker-php-ext-install soap \
    && apt-get install -y libxslt-dev \

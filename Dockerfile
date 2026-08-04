@@ -1,4 +1,4 @@
-ARG PHP_VERSION=8.2
+ARG PHP_VERSION=8.4
 FROM php:${PHP_VERSION}-cli as base
 
 RUN apt-get update \
@@ -24,6 +24,10 @@ RUN apt-get update \
        && docker-php-ext-install sockets \
        && pecl install amqp \
        && docker-php-ext-enable amqp \
+       && pecl install apcu \
+       && docker-php-ext-enable apcu \
+       && pecl install pcov \
+       && docker-php-ext-enable pcov \
        && docker-php-ext-install pcntl \
    && apt-get -y install libgmp-dev \
        && docker-php-ext-install gmp \
@@ -32,19 +36,26 @@ RUN apt-get update \
 
 FROM base as dependencies
 ARG COMPOSER_VERSION=latest-2.2.x
-ARG DEPLOYER_VERSION=v7.5.8
+ARG DEPLOYER_VERSION=v7.5.12
 ARG PHPCS_VERSION=3.7.2
+ARG NODE_VERSION=22
 
 # PHP Configuration
 RUN echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini
 RUN echo "date.timezone=UTC" > $PHP_INI_DIR/conf.d/date_timezone.ini
-    
+RUN echo "apc.enable_cli=1" > $PHP_INI_DIR/conf.d/apcu-cli.ini
+
+# Install Node.js (includes npm)
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install PHP Code sniffer
 RUN curl -OL https://github.com/squizlabs/PHP_CodeSniffer/releases/download/${PHPCS_VERSION}/phpcs.phar \
     && chmod 755 phpcs.phar \
     && mv phpcs.phar /usr/local/bin/ \
     && ln -s /usr/local/bin/phpcs.phar /usr/local/bin/phpcs
-    
+
 # Install deployer
 RUN curl -LO https://deployer.org/releases/${DEPLOYER_VERSION}/deployer.phar \
     && mv deployer.phar /usr/local/bin/dep \

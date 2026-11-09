@@ -14,7 +14,7 @@ Default target: **PHP 8.4** with **APCu** (`apc.enable_cli=1`), **pcov**, and **
 | Deployer | `v7.5.12` (`DEPLOYER_VERSION`) |
 | PHP_CodeSniffer | `3.7.2` (`PHPCS_VERSION`) |
 
-Notable PHP extensions: `pdo_mysql`, `ftp`, `soap`, `xsl`, `intl`, `gd`, `zip`, `sockets`, `amqp`, `apcu`, `pcov`, `pcntl`, `gmp`, `bcmath`.
+Notable PHP extensions: `pdo_mysql`, `ftp`, `soap`, `xsl`, `intl`, `gd`, `zip`, `sockets`, `amqp`, `apcu`, `pcov`, `redis`, `pcntl`, `gmp`, `bcmath`.
 
 ## Build arguments
 
@@ -25,6 +25,33 @@ Notable PHP extensions: `pdo_mysql`, `ftp`, `soap`, `xsl`, `intl`, `gd`, `zip`, 
 | `COMPOSER_VERSION` | `latest-2.2.x` | Composer phar release path segment |
 | `DEPLOYER_VERSION` | `v7.5.12` | Deployer release tag |
 | `PHPCS_VERSION` | `3.7.2` | PHP_CodeSniffer release tag |
+
+## PHP 7.4 builds
+
+`php:7.4-cli` is based on Debian bullseye, which is EOL. The Dockerfile detects buster/bullseye and
+switches APT to `archive.debian.org`, then upgrades `ca-certificates` so that newer CA roots (e.g. Sectigo
+R46/E46) are trusted and HTTPS access to Git hosts works. It also pins `amqp` to 1.11.0 on PHP < 8.
+
+```bash
+docker buildx build \
+  --platform linux/amd64 \
+  --push \
+  --build-arg PHP_VERSION=7.4 \
+  -t innobyte/magento2-gitlab-ci:7.4-deployer7.x \
+  .
+```
+
+## Published tags
+
+All tags are built from `master`, only the build arguments differ:
+
+| Tag | Build arguments |
+|-----|-----------------|
+| `7.4-deployer7.x` | `PHP_VERSION=7.4` |
+| `8.2-deployer7.x` | `PHP_VERSION=8.2` |
+| `8.3-deployer7.x` | `PHP_VERSION=8.3` |
+| `8.4-deployer7.x` | `PHP_VERSION=8.4` |
+| `7.4-composer2` | `PHP_VERSION=7.4 DEPLOYER_VERSION=v6.9.0` (Deployer 6.x) |
 
 ## Build and push
 

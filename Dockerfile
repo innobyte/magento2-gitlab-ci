@@ -1,11 +1,26 @@
 ARG PHP_VERSION=8.4
 FROM php:${PHP_VERSION}-cli as base
 
+# php:7.4 is based on Debian bullseye, which is EOL: its packages moved to archive.debian.org
+# (deb.debian.org returns 404 for bullseye-security pool files, so ca-certificates cannot be
+# upgraded from there). Only applies to EOL releases; newer PHP images are left untouched.
+RUN . /etc/os-release \
+   && case "$VERSION_CODENAME" in \
+        buster|bullseye) \
+          sed -i 's|http://deb.debian.org/debian-security|http://archive.debian.org/debian-security|; s|http://deb.debian.org/debian |http://archive.debian.org/debian |' /etc/apt/sources.list \
+          && echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99archive-debian ;; \
+      esac
+
+# ca-certificates is upgraded explicitly: the stock bullseye bundle (20210119) lacks newer CA roots
+# (e.g. Sectigo Public Server Authentication Root R46/E46), so git/composer/curl fail with
+# "unable to get local issuer certificate" against hosts using certificates issued under them.
 RUN apt-get update \
    && apt-get install -y \
+      ca-certificates \
       git-core \
       pigz unzip zip \
       rsync \
+      libssl-dev \
    && docker-php-ext-install pdo_mysql \
    && docker-php-ext-install ftp \
    && apt-get install -y libxml2-dev \
@@ -22,12 +37,14 @@ RUN apt-get update \
        && docker-php-ext-install zip \
    && apt-get install -y librabbitmq-dev \
        && docker-php-ext-install sockets \
-       && pecl install amqp \
+       && if [ "$(php -r 'echo PHP_MAJOR_VERSION;')" -lt 8 ]; then pecl install amqp-1.11.0; else pecl install amqp; fi \
        && docker-php-ext-enable amqp \
        && pecl install apcu \
        && docker-php-ext-enable apcu \
        && pecl install pcov \
        && docker-php-ext-enable pcov \
+       && pecl install redis \
+       && docker-php-ext-enable redis \
        && docker-php-ext-install pcntl \
    && apt-get -y install libgmp-dev \
        && docker-php-ext-install gmp \
